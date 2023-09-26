@@ -17,7 +17,7 @@
 **Ссылка на сайт производителя:** https://www.onliner.by
 
 Главная страница Onliner  
-![Главная страница Onliner](images/analogues/onliner.png)  
+![Главная страница Onliner](docs_images/analogues/onliner.png)
 
 Onliner - белорусский сайт, включающий в себе маркетплейс различных товаров и услуг. Также включает в себя СМИ и форум.
 <a name="c_organizer"/>
@@ -28,7 +28,7 @@ Onliner - белорусский сайт, включающий в себе ма
 **Ссылка на сайт производителя:** https://www.avito.ru
 
 Главная страница Onliner
-![Главная страница Avito](images/analogues/avito.png)  
+![Главная страница Avito](docs_images/analogues/avito.png)  
 
 Avito - российский интернет-сервис, предназначенный для размещения объявлений о продажи или предоставлении различных тоаваров и услуг. 
 
