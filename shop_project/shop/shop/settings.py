@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'user',
     'registration',
+    'authorization',
 ]
 
 AUTH_USER_MODEL = 'user.AuthUser'
