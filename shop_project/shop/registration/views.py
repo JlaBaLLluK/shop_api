@@ -1,3 +1,4 @@
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from rest_framework.response import Response
@@ -27,4 +28,6 @@ class UserRegistrationView(APIView):
                                             first_name=request.data.get('first_name'),
                                             last_name=request.data.get('last_name'),
                                             )
+        user = authenticate(user)
+        login(request, user)
         return Response(UserRegistrationSerializer(user).data, status=HTTP_201_CREATED)
