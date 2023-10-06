@@ -27,4 +27,4 @@ class UserRegistrationView(APIView):
                                             first_name=request.data.get('first_name'),
                                             last_name=request.data.get('last_name'),
                                             )
-        return Response(UserRegistrationSerializer(user.data), status=HTTP_201_CREATED)
+        return Response(UserRegistrationSerializer(user).data, status=HTTP_201_CREATED)
