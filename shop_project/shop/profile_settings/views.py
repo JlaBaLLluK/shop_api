@@ -1,6 +1,4 @@
 from rest_framework.views import APIView
-from django.shortcuts import render
-
 from profile_settings.serializers import *
 
 
@@ -24,5 +22,5 @@ class DeleteProfiledView(APIView):
     serializer_class = ...
 
     @staticmethod
-    def put(request, username):
+    def delete(request, username):
         pass

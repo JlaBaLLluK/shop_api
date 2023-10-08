@@ -11,4 +11,4 @@ class UserView(APIView):
 
     @staticmethod
     def get(request, username):
-        return Response(UserSerializer(AuthUser.objects.get(username=username)).data, status=HTTP_200_OK)
+        return Response(UserSerializer(AuthUser.objects.get(username=request.user)).data, status=HTTP_200_OK)
