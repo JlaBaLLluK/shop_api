@@ -26,7 +26,7 @@ class ChangePasswordView(APIView):
             return Response({"errors": "Failed to confirm new password"}, status=HTTP_400_BAD_REQUEST)
 
         serializer.update(user_object, serializer.validated_data)
-        return Response(serializer.data, status=HTTP_200_OK)
+        return Response({"success": "Password was changed successfully!"}, status=HTTP_200_OK)
 
 
 class ResetPasswordView(APIView):
@@ -58,7 +58,7 @@ class ChangeUsernameView(APIView):
             return Response({"errors": "Failed to confirm password!"}, status=HTTP_400_BAD_REQUEST)
 
         serializer.update(user_object, serializer.validated_data)
-        return Response(serializer.data, status=HTTP_200_OK)
+        return Response({"success": "Username was changed successfully!"}, status=HTTP_200_OK)
 
 
 class DeleteProfileView(APIView):
