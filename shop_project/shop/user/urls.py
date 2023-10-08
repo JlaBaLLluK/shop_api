@@ -4,6 +4,5 @@ from user.views import *
 
 
 urlpatterns = [
-    path('<str:username>/', login_required(UserView.as_view(), login_url='#')),
-    path('<str:username>/', include('profile_settings.urls')),
+    path('user-data/', UserView.as_view()),
 ]

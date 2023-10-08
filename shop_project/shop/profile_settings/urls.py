@@ -3,7 +3,8 @@ from django.urls import path
 from profile_settings.views import *
 
 urlpatterns = [
-    path('change-password/', login_required(ChangePasswordView.as_view(), login_url='login')),
-    path('change-username/', login_required(ChangeUsernameView.as_view(), login_url='login')),
-    path('delete-profile/', login_required(DeleteProfiledView.as_view(), login_url='login')),
+    path('change-password/', ChangePasswordView.as_view()),
+    path('reset-password/', ResetPasswordView.as_view()),
+    path('change-username/', ChangeUsernameView.as_view()),
+    path('delete-account/', DeleteProfileView.as_view()),
 ]
