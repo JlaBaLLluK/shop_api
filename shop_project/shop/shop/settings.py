@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'profile_settings',
     'registration',
     'authorization',
+    'sale_advertisement',
 ]
 
 AUTH_USER_MODEL = 'user.AuthUser'
