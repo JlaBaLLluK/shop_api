@@ -17,7 +17,7 @@ class SaleAdvertisement(models.Model):
     ]
     currency = models.CharField(max_length=3, blank=False, choices=CURRENCIES)
     advertisement_author = models.ForeignKey(AuthUser, on_delete=models.CASCADE)
-    is_new = models.BooleanField(blank=False, null=True)
+    is_new = models.BooleanField(blank=False)
 
     class Meta:
         db_table = 'Advertisements'
