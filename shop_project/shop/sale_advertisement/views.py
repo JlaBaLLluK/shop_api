@@ -12,8 +12,17 @@ class AllAdvertisementsView(APIView):
     serializer_class = AllAdvertisementsSerializer
     MAX_ADVERTISEMENTS_ON_PAGE = 20
 
-    def get_sorted_advertisements(self, page_number, sort_order):
-        advertisements = SaleAdvertisement.objects.all()
+    @staticmethod
+    def get_sort_order(request):
+        return request.query_params.get('sort_order')
+
+    @staticmethod
+    def get_filters(request):
+        location = request.query_params.get('location')
+        is_new = request.query_params.get('is_new')
+        return [location if location is not None else None] + [bool(int(is_new)) if is_new is not None else None]
+
+    def get_sorted_advertisements(self, page_number, sort_order, advertisements):
         queries = {
             "newest": "-publish_date",
             "oldest": "publish_date",
@@ -32,12 +41,26 @@ class AllAdvertisementsView(APIView):
         slice_upper_bound = self.MAX_ADVERTISEMENTS_ON_PAGE * page_number
         return advertisements[slice_lower_bound:slice_upper_bound]
 
+    @staticmethod
+    def get_filtered_advertisements(filters):
+        advertisements = SaleAdvertisement.objects.all()
+        if filters[0] is not None:
+            advertisements = advertisements.filter(advertisement_location=filters[0])
+
+        if filters[1] is not None:
+            advertisements = advertisements.filter(is_new=filters[1])
+
+        return advertisements
+
     def get(self, request, page_number):
-        sort_order = request.query_params.get('sort_order')
+        sort_order = self.get_sort_order(request)
+        filters = self.get_filters(request)
+        filtered_advertisements = self.get_filtered_advertisements(filters)
         try:
-            advertisements = self.get_sorted_advertisements(page_number, sort_order)
+            advertisements = self.get_sorted_advertisements(page_number, sort_order, filtered_advertisements)
         except BadRequest:
             return Response({"error": "Unknown sort order!"}, status=HTTP_400_BAD_REQUEST)
+
         if len(advertisements) == 0:
             return Response({"information": "There is no data yet!"}, status=HTTP_204_NO_CONTENT)
 

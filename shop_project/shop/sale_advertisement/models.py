@@ -15,3 +15,6 @@ class SaleAdvertisement(models.Model):
 
     class Meta:
         db_table = 'Advertisements'
+
+    def __str__(self):
+        return self.advertisement_title
