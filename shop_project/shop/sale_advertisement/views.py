@@ -14,21 +14,22 @@ class AllAdvertisementsView(APIView):
 
     def get_sorted_advertisements(self, page_number, sort_order):
         advertisements = SaleAdvertisement.objects.all()
+        queries = {
+            "newest": "-publish_date",
+            "oldest": "publish_date",
+            "most_popular": "-views_amount",
+            "most_unpopular": "views_amount",
+            "most_cheep": "advertisement_price",
+            "most_expensive": "-advertisement_price",
+        }
+
+        if sort_order not in queries.keys() and sort_order is not None:
+            raise BadRequest
+        elif sort_order is not None:
+            advertisements = advertisements.order_by(queries[sort_order])
+
         slice_lower_bound = (page_number - 1) * self.MAX_ADVERTISEMENTS_ON_PAGE
         slice_upper_bound = self.MAX_ADVERTISEMENTS_ON_PAGE * page_number
-        if sort_order == 'newest':
-            advertisements = advertisements.order_by('-publish_date').values()
-        elif sort_order == 'oldest':
-            advertisements = advertisements.order_by('publish_date').values()
-        elif sort_order == 'most_popular':
-            advertisements = advertisements.order_by('-views_amount').values()
-        elif sort_order == 'most_unpopular':
-            advertisements = advertisements.order_by('views_amount').values()
-        elif sort_order is None:
-            pass
-        else:
-            raise BadRequest
-
         return advertisements[slice_lower_bound:slice_upper_bound]
 
     def get(self, request, page_number):
