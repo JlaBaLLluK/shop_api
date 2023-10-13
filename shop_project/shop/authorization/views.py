@@ -13,7 +13,7 @@ class LoginView(APIView):
     def post(request):
         serializer = LoginSerializer(data=request.data)
         if not serializer.is_valid():
-            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+            return Response(serializer.errors, status=HTTP_401_UNAUTHORIZED)
 
         user_object = authenticate(username=serializer.data.get('username'), password=serializer.data.get('password'))
         if user_object is None:
