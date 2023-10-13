@@ -12,9 +12,9 @@ class UserRegistrationSerializer(ModelSerializer):
         fields = '__all__'
 
     def save(self, **kwargs):
-        AuthUser.objects.create_user(username=self.data['username'],
-                                     password=self.data['password'],
-                                     email=self.data['email'],
-                                     first_name=self.data['first_name'],
-                                     last_name=self.data['last_name'],
-                                     )
+        user = AuthUser.objects.create_user(username=self.data['username'],
+                                            password=self.data['password'],
+                                            email=self.data['email'],
+                                            first_name=self.data['first_name'],
+                                            last_name=self.data['last_name'],
+                                            )

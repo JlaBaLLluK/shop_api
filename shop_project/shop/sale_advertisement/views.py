@@ -6,6 +6,7 @@ from rest_framework.status import *
 from sale_advertisement.serializers import *
 from rest_framework.views import APIView
 from sale_advertisement.models import *
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 
 
 class AllAdvertisementsView(APIView):
@@ -70,6 +71,7 @@ class AllAdvertisementsView(APIView):
 
 class CreateAdvertisementView(APIView):
     serializer_class = SingleAdvertisementSerializer
+    permission_classes = [IsAuthenticated]
 
     @staticmethod
     def post(request):
@@ -83,6 +85,7 @@ class CreateAdvertisementView(APIView):
 
 class SingleAdvertisementView(APIView):
     serializer_class = SingleAdvertisementSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     @staticmethod
     def get_advertisement(pk):

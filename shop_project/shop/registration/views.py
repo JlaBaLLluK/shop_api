@@ -1,4 +1,4 @@
-from django.contrib.auth import login
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from rest_framework.response import Response
@@ -9,6 +9,7 @@ from registration.serializers import *
 
 class UserRegistrationView(APIView):
     serializer_class = UserRegistrationSerializer
+    permission_classes = []
 
     @staticmethod
     def post(request):
@@ -22,4 +23,6 @@ class UserRegistrationView(APIView):
             return Response({'error': error.messages}, status=HTTP_400_BAD_REQUEST)
 
         serializer.save()
+        user = authenticate(username=serializer.data.get('username'), password=serializer.data.get('password'))
+        login(request, user)
         return Response(serializer.data, status=HTTP_201_CREATED)
