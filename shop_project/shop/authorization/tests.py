@@ -1,3 +1,4 @@
+from django.contrib.auth import login
 from rest_framework.test import APITestCase
 from rest_framework.status import *
 
@@ -13,7 +14,7 @@ class AuthorizationTests(APITestCase):
     url = '/api/authorization/login/'
 
     def setUp(self) -> None:
-        user = AuthUser.objects.create_user(username=self.data['username'], password=self.data['password'])
+        AuthUser.objects.create_user(username=self.data['username'], password=self.data['password'])
 
     def test_if_login_successful(self):
         response = self.client.post(self.url, self.data)
@@ -49,3 +50,25 @@ class AuthorizationTests(APITestCase):
         response = self.client.post(self.url, wrong_credentials)
         self.assertEqual(response.status_code, HTTP_401_UNAUTHORIZED)
         self.assertEqual('blank', response.data['username'][0].code.lower())
+
+
+class LogoutTests(APITestCase):
+    data = {
+        'username': 'test_user',
+        'password': 'test_user_password1',
+    }
+
+    url = '/api/authorization/logout/'
+
+    def setUp(self) -> None:
+        AuthUser.objects.create_user(username=self.data['username'], password=self.data['password'])
+
+    def test_if_logout_successful(self):
+        self.client.post(AuthorizationTests.url, AuthorizationTests.data)
+        response = self.client.post(self.url)
+        self.assertEqual(HTTP_200_OK, response.status_code)
+        self.assertEqual(response.data['success'], "Logout successful!")
+
+    def test_if_logout_unsuccessful(self):
+        response = self.client.post(self.url)
+        self.assertEqual(HTTP_403_FORBIDDEN, response.status_code)
