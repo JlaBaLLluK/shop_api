@@ -7,8 +7,6 @@ from rest_framework.views import APIView
 from profile_settings.serializers import *
 from rest_framework.status import *
 
-from user.models import AuthUser
-
 
 class ChangePasswordView(APIView):
     serializer_class = ChangePasswordSerializer
