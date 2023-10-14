@@ -7,4 +7,5 @@ urlpatterns = [
     path('reset-password/', ResetPasswordView.as_view()),
     path('change-username/', ChangeUsernameView.as_view()),
     path('delete-account/', DeleteProfileView.as_view()),
+    path('change-other-information/', ChangeOtherInformationView.as_view()),
 ]

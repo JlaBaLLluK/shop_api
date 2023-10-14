@@ -75,7 +75,6 @@ class ChangeUsernameTests(APITestCase):
         data = {
             'new_username': 'new_test_user',
             'password': 'test_user_password1',
-            'password_confirm': 'test_user_password1',
         }
 
         response = self.client.put(self.url, data)
@@ -84,13 +83,12 @@ class ChangeUsernameTests(APITestCase):
     def test_if_change_username_unsuccessful(self):
         data = {
             'new_username': 'new_test_user',
-            'password': 'test_user_password1',
-            'password_confirm': 'wrong_user_password1',
+            'password': 'wrong_user_password1',
         }
 
         response = self.client.put(self.url, data)
         self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data['errors'], "Failed to confirm password!")
+        self.assertEqual(response.data['errors'], "This password is wrong!")
 
 
 class DeleteProfileTests(APITestCase):
