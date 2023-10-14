@@ -71,7 +71,7 @@ class ChangeUsernameTests(APITestCase):
         AuthUser.objects.create_user(username=self.data['username'], password=self.data['password'])
         self.client.post('/api/authorization/login/', self.data)
 
-    def test_is_change_username_successful(self):
+    def test_if_change_username_successful(self):
         data = {
             'new_username': 'new_test_user',
             'password': 'test_user_password1',
@@ -81,7 +81,7 @@ class ChangeUsernameTests(APITestCase):
         response = self.client.put(self.url, data)
         self.assertEqual(response.status_code, HTTP_200_OK)
 
-    def test_is_change_username_unsuccessful(self):
+    def test_if_change_username_unsuccessful(self):
         data = {
             'new_username': 'new_test_user',
             'password': 'test_user_password1',
@@ -91,3 +91,34 @@ class ChangeUsernameTests(APITestCase):
         response = self.client.put(self.url, data)
         self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data['errors'], "Failed to confirm password!")
+
+
+class DeleteProfileTests(APITestCase):
+    data = {
+        'username': 'test_user',
+        'password': 'test_user_password1',
+    }
+
+    url = '/api/profile_settings/delete-account/'
+
+    def setUp(self) -> None:
+        AuthUser.objects.create_user(username=self.data['username'], password=self.data['password'])
+        self.client.post('/api/authorization/login/', self.data)
+
+    def test_if_delete_profile_successful(self):
+        data = {
+            'password': 'test_user_password1',
+            'password_confirm': 'test_user_password1',
+        }
+
+        response = self.client.post(self.url, data)
+        self.assertEqual(response.status_code, HTTP_200_OK)
+
+    def test_if_delete_profile_unsuccessful(self):
+        data = {
+            'password': 'test_user_password1',
+            'password_confirm': 'wrong_test_user_password1',
+        }
+
+        response = self.client.post(self.url, data)
+        self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
