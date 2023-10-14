@@ -55,5 +55,39 @@ class ChangePasswordTests(APITestCase):
         }
 
         response = self.client.put(self.url, data)
-        # self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
         self.assertIsNotNone(response.data['errors'])
+
+
+class ChangeUsernameTests(APITestCase):
+    data = {
+        'username': 'test_user',
+        'password': 'test_user_password1',
+    }
+
+    url = '/api/profile_settings/change-username/'
+
+    def setUp(self) -> None:
+        AuthUser.objects.create_user(username=self.data['username'], password=self.data['password'])
+        self.client.post('/api/authorization/login/', self.data)
+
+    def test_is_change_username_successful(self):
+        data = {
+            'new_username': 'new_test_user',
+            'password': 'test_user_password1',
+            'password_confirm': 'test_user_password1',
+        }
+
+        response = self.client.put(self.url, data)
+        self.assertEqual(response.status_code, HTTP_200_OK)
+
+    def test_is_change_username_unsuccessful(self):
+        data = {
+            'new_username': 'new_test_user',
+            'password': 'test_user_password1',
+            'password_confirm': 'wrong_user_password1',
+        }
+
+        response = self.client.put(self.url, data)
+        self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['errors'], "Failed to confirm password!")
