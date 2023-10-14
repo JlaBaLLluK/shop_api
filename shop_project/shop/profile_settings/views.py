@@ -25,12 +25,12 @@ class ChangePasswordView(APIView):
             return Response({"errors": "Old password is wrong!"}, status=HTTP_400_BAD_REQUEST)
 
         if serializer.data.get('new_password') != serializer.data.get('new_password_confirm'):
-            return Response({"errors": "Failed to confirm new password"}, status=HTTP_400_BAD_REQUEST)
+            return Response({"errors": "Failed to confirm new password!"}, status=HTTP_400_BAD_REQUEST)
 
         try:
             validate_password(serializer.data.get('new_password'))
         except ValidationError as error:
-            return Response({'error': error.messages}, status=HTTP_400_BAD_REQUEST)
+            return Response({'errors': error.messages}, status=HTTP_400_BAD_REQUEST)
 
         serializer.update(user_object, serializer.validated_data)
         return Response({"success": "Password was changed successfully!"}, status=HTTP_200_OK)
