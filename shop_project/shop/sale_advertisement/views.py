@@ -101,8 +101,12 @@ class SingleAdvertisementView(APIView):
         if advertisement is None:
             return Response({"errors": "This advertisement doesn't exist!"}, status=HTTP_404_NOT_FOUND)
 
-        advertisement.views_amount += 1
-        advertisement.save()
+        users_checked_advertisement = advertisement.users_checked_advertisement.all()
+        if request.user.is_authenticated and request.user not in users_checked_advertisement:
+            advertisement.views_amount += 1
+            advertisement.save()
+            advertisement.users_checked_advertisement.add(request.user)
+
         return Response(SingleAdvertisementSerializer(advertisement).data, status=HTTP_200_OK)
 
     def put(self, request, page_number, pk):
