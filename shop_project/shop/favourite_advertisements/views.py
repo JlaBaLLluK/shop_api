@@ -11,6 +11,7 @@ from favourite_advertisements.serializers import *
 
 class AllFavouriteAdvertisementsView(APIView):
     serializer_class = AllFavouriteAdvertisementsSerializer
+    permission_classes = [IsAuthenticated]
 
     @staticmethod
     def get(request):

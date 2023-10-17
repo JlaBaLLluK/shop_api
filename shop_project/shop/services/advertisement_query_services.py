@@ -1,8 +1,6 @@
 from django.core.exceptions import BadRequest
 from django.db.models import QuerySet
 
-from sale_advertisement.models import SaleAdvertisement
-
 
 class AdvertisementQueryServices:
     sort_queries = {
