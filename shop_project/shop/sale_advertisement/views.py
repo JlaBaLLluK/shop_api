@@ -7,61 +7,29 @@ from sale_advertisement.serializers import *
 from rest_framework.views import APIView
 from sale_advertisement.models import *
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+from services.advertisement_query_services import AdvertisementQueryServices
 
 
 class AllAdvertisementsView(APIView):
     serializer_class = AllAdvertisementsSerializer
-    MAX_ADVERTISEMENTS_ON_PAGE = 20
-
-    @staticmethod
-    def get_sort_order(request):
-        return request.query_params.get('sort_order')
-
-    @staticmethod
-    def get_filters(request):
-        location = request.query_params.get('location')
-        is_new = request.query_params.get('is_new')
-        return [location if location is not None else None] + [bool(int(is_new)) if is_new is not None else None]
-
-    def get_sorted_advertisements(self, page_number, sort_order, advertisements):
-        queries = {
-            "newest": "-publish_date",
-            "oldest": "publish_date",
-            "most_popular": "-views_amount",
-            "most_unpopular": "views_amount",
-            "most_cheep": "advertisement_price",
-            "most_expensive": "-advertisement_price",
-        }
-
-        if sort_order not in queries.keys() and sort_order is not None:
-            raise BadRequest
-        elif sort_order is not None:
-            advertisements = advertisements.order_by(queries[sort_order])
-
-        slice_lower_bound = (page_number - 1) * self.MAX_ADVERTISEMENTS_ON_PAGE
-        slice_upper_bound = self.MAX_ADVERTISEMENTS_ON_PAGE * page_number
-        return advertisements[slice_lower_bound:slice_upper_bound]
-
-    @staticmethod
-    def get_filtered_advertisements(filters):
-        advertisements = SaleAdvertisement.objects.all()
-        if filters[0] is not None:
-            advertisements = advertisements.filter(advertisement_location=filters[0])
-
-        if filters[1] is not None:
-            advertisements = advertisements.filter(is_new=filters[1])
-
-        return advertisements
+    MAX_ADVERTISEMENTS_ON_PAGE = 3
 
     def get(self, request, page_number):
-        sort_order = self.get_sort_order(request)
-        filters = self.get_filters(request)
-        filtered_advertisements = self.get_filtered_advertisements(filters)
+        advertisement_query_services = AdvertisementQueryServices(request, SaleAdvertisement.objects.all())
         try:
-            advertisements = self.get_sorted_advertisements(page_number, sort_order, filtered_advertisements)
+            advertisement_query_services.get_sort_order()
+            advertisement_query_services.get_filters()
         except BadRequest:
-            return Response({"error": "Unknown sort order!"}, status=HTTP_400_BAD_REQUEST)
+            return Response({"errors": "Wrong query!"})
 
+        try:
+            advertisement_query_services.filter_queryset()
+            advertisement_query_services.sort_queryset()
+        except BadRequest:
+            return Response({"error": "Unknown query!"}, status=HTTP_400_BAD_REQUEST)
+
+        advertisements = advertisement_query_services.queryset[(page_number - 1) * self.MAX_ADVERTISEMENTS_ON_PAGE:
+                                                               page_number * self.MAX_ADVERTISEMENTS_ON_PAGE]
         if len(advertisements) == 0:
             return Response({"information": "There is no data yet!"}, status=HTTP_204_NO_CONTENT)
 
