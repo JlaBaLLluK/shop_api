@@ -19,17 +19,20 @@ class AdvertisementQueryServices:
         self.is_new = ''
         self.location = ''
 
+    def get_param_if_exists(self, param):
+        value = self.request.query_params.get(param)
+        return value if value is not None else ''
+
     def get_sort_order(self):
-        if self.request.query_params.get('sort_order') is not None:
-            self.sort_order = self.request.query_params.get('sort_order')
+        self.sort_order = self.get_param_if_exists('sort_order')
         if self.sort_order != '' and self.sort_order not in self.sort_queries.keys():
             raise BadRequest
 
     def get_filters(self):
-        if self.request.query_params.get('location') is not None:
-            self.location = self.request.query_params.get('location')
+        self.location = self.get_param_if_exists('location')
         try:
-            if self.request.query_params.get('is_new') is not None:
+            self.is_new = self.get_param_if_exists('is_new')
+            if self.is_new != '':
                 self.is_new = bool(int(self.request.query_params.get('is_new')))
         except ValueError:
             raise BadRequest

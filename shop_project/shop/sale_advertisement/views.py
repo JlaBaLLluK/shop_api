@@ -12,7 +12,7 @@ from services.advertisement_query_services import AdvertisementQueryServices
 
 class AllAdvertisementsView(APIView):
     serializer_class = AllAdvertisementsSerializer
-    MAX_ADVERTISEMENTS_ON_PAGE = 3
+    MAX_ADVERTISEMENTS_ON_PAGE = 20
 
     def get(self, request, page_number):
         advertisement_query_services = AdvertisementQueryServices(request, SaleAdvertisement.objects.all())
