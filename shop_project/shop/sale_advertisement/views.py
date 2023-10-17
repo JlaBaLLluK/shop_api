@@ -19,17 +19,12 @@ class AllAdvertisementsView(APIView):
         try:
             advertisement_query_services.get_sort_order()
             advertisement_query_services.get_filters()
+            advertisement_query_services.get_price_bounds()
         except BadRequest:
             return Response({"errors": "Wrong query!"})
-
-        try:
-            advertisement_query_services.filter_queryset()
-            advertisement_query_services.sort_queryset()
-        except BadRequest:
-            return Response({"error": "Unknown query!"}, status=HTTP_400_BAD_REQUEST)
-
-        advertisements = advertisement_query_services.queryset[(page_number - 1) * self.MAX_ADVERTISEMENTS_ON_PAGE:
-                                                               page_number * self.MAX_ADVERTISEMENTS_ON_PAGE]
+        advertisements = advertisement_query_services.make_queryset()[
+                         (page_number - 1) * self.MAX_ADVERTISEMENTS_ON_PAGE:
+                         page_number * self.MAX_ADVERTISEMENTS_ON_PAGE]
         if len(advertisements) == 0:
             return Response({"information": "There is no data yet!"}, status=HTTP_204_NO_CONTENT)
 

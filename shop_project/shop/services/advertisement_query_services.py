@@ -1,6 +1,8 @@
 from django.core.exceptions import BadRequest
 from django.db.models import QuerySet
 
+from sale_advertisement.models import SaleAdvertisement
+
 
 class AdvertisementQueryServices:
     sort_queries = {
@@ -18,6 +20,8 @@ class AdvertisementQueryServices:
         self.sort_order = ''
         self.is_new = ''
         self.location = ''
+        self.price_lower_bound = ''
+        self.price_upper_bound = ''
 
     def get_param_if_exists(self, param):
         value = self.request.query_params.get(param)
@@ -33,9 +37,30 @@ class AdvertisementQueryServices:
         try:
             self.is_new = self.get_param_if_exists('is_new')
             if self.is_new != '':
-                self.is_new = bool(int(self.request.query_params.get('is_new')))
+                self.is_new = bool(int(self.is_new))
         except ValueError:
             raise BadRequest
+
+    def get_price_bounds(self):
+        self.price_lower_bound = self.get_param_if_exists('price_lower_bound')
+        self.price_upper_bound = self.get_param_if_exists('price_upper_bound')
+        try:
+            if self.price_lower_bound != '':
+                self.price_lower_bound = int(self.price_lower_bound)
+            else:
+                self.price_lower_bound = 0
+
+            if self.price_upper_bound != '':
+                self.price_upper_bound = int(self.price_upper_bound)
+            else:
+                self.price_upper_bound = 99_999_999
+
+        except ValueError:
+            raise BadRequest
+
+    def get_queryset_according_to_price(self):
+        self.queryset = self.queryset.filter(advertisement_price__lte=self.price_upper_bound,
+                                             advertisement_price__gte=self.price_lower_bound)
 
     def filter_queryset(self):
         if self.location != '':
@@ -47,3 +72,9 @@ class AdvertisementQueryServices:
     def sort_queryset(self):
         if self.sort_order != '':
             self.queryset = self.queryset.order_by(self.sort_queries[self.sort_order])
+
+    def make_queryset(self):
+        self.get_queryset_according_to_price()
+        self.filter_queryset()
+        self.sort_queryset()
+        return self.queryset
