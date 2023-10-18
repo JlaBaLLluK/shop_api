@@ -38,22 +38,14 @@ class AddToFavouriteAdvertisementsView(APIView):
     def post(self, request, page_number, pk):
         advertisement = self.get_advertisement(pk)
         if advertisement is None:
-            return Response({"errors": "This advertisement doesn't exist!"}, status=HTTP_404_NOT_FOUND)
-        try:
-            user_favourite_advertisements = FavouriteAdvertisements.objects.get(user=request.user)
-        except ObjectDoesNotExist:
-            user_favourite_advertisements = FavouriteAdvertisements(user=request.user, adding_date=[datetime.now()])
-            user_favourite_advertisements.advertisements_amount += 1
-            user_favourite_advertisements.save()
-        else:
-            user_favourite_advertisements.advertisements_amount += 1
-            user_favourite_advertisements.adding_date.append(datetime.now())
-            user_favourite_advertisements.save()
-            if advertisement not in user_favourite_advertisements.advertisements.all():
-                user_favourite_advertisements.advertisements.add(advertisement)
-            else:
-                user_favourite_advertisements.advertisements.remove(advertisement)
-                return Response({"success": "Advertisement was removed from favourite successfully!"},
-                                status=HTTP_200_OK)
+            return Response({"errors": "This advertisements doesn't exist!"}, status=HTTP_404_NOT_FOUND)
 
-        return Response({"success": "Advertisement was added to favourite successfully!"}, status=HTTP_200_OK)
+        try:
+            FavouriteAdvertisements.objects.get(advertisement=advertisement)
+        except ObjectDoesNotExist:
+            favourite_advertisement = FavouriteAdvertisements(user=request.user, advertisement=advertisement)
+            favourite_advertisement.save()
+            return Response({"success": "Advertisement was added to favourite successfully!"}, status=HTTP_200_OK)
+        else:
+            return Response({"success": "This advertisement already in favourite advertisements!"},
+                            status=HTTP_204_NO_CONTENT)
