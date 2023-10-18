@@ -10,6 +10,3 @@ class FavouriteAdvertisements(models.Model):
 
     class Meta:
         db_table = "FavouriteAdvertisements"
-
-    def __str__(self):
-        return str(self.adding_date)

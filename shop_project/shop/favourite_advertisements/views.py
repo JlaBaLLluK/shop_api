@@ -1,7 +1,6 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
 from django.shortcuts import get_object_or_404
-from django.utils.datetime_safe import datetime
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import *
@@ -15,7 +14,7 @@ class AllFavouriteAdvertisementsView(APIView):
 
     @staticmethod
     def get(request):
-        advertisements = FavouriteAdvertisements.objects.all()
+        advertisements = FavouriteAdvertisements.objects.filter(user=request.user)
         if len(advertisements) == 0:
             return Response({"information": "There is no data yet!"}, status=HTTP_204_NO_CONTENT)
 
