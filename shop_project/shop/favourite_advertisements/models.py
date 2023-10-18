@@ -7,9 +7,9 @@ from user.models import AuthUser
 
 class FavouriteAdvertisements(models.Model):
     user = models.OneToOneField(AuthUser, on_delete=models.CASCADE)
-    advertisements = models.ManyToManyField(SaleAdvertisement, default=0)
+    advertisements = models.ForeignKey(SaleAdvertisement, on_delete=models.CASCADE)
     advertisements_amount = models.PositiveIntegerField(default=0)
-    adding_date = ArrayField(models.DateTimeField())
+    adding_date = models.DateTimeField()
 
     class Meta:
         db_table = "FavouriteAdvertisements"
