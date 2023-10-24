@@ -31,7 +31,7 @@ class AdvertisementQueryServices:
             raise BadRequest
 
     def get_filters(self):
-        self.location = self.get_param_if_exists('location')
+        self.location = self.get_param_if_exists('location').capitalize()
         try:
             self.is_new = self.get_param_if_exists('is_new')
             if self.is_new != '':
