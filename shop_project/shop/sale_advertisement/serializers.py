@@ -14,3 +14,7 @@ class SingleAdvertisementSerializer(ModelSerializer):
     class Meta:
         model = SaleAdvertisement
         fields = '__all__'
+
+    def create(self, validated_data):
+        validated_data['advertisement_location'] = validated_data['advertisement_location'].capitalize()
+        super().create(validated_data)
