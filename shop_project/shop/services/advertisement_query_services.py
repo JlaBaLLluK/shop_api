@@ -20,6 +20,7 @@ class AdvertisementQueryServices:
         self.location = ''
         self.price_lower_bound = ''
         self.price_upper_bound = ''
+        self.key_words = ''
 
     def get_param_if_exists(self, param):
         value = self.request.query_params.get(param)
@@ -56,6 +57,9 @@ class AdvertisementQueryServices:
         except ValueError:
             raise BadRequest
 
+    def get_search_query(self):
+        self.key_words = self.get_param_if_exists('key_words').split('+')
+
     def get_queryset_according_to_price(self):
         self.queryset = self.queryset.filter(advertisement_price__lte=self.price_upper_bound,
                                              advertisement_price__gte=self.price_lower_bound)
@@ -71,8 +75,16 @@ class AdvertisementQueryServices:
         if self.sort_order != '':
             self.queryset = self.queryset.order_by(self.sort_queries[self.sort_order])
 
+    def get_queryset_according_to_key_words(self):
+        for queryset_object in self.queryset:
+            for key_word in self.key_words:
+                if key_word.lower() not in queryset_object.advertisement_description.lower():
+                    self.queryset = self.queryset.exclude(id=queryset_object.id)
+                    break
+
     def make_queryset(self):
         self.get_queryset_according_to_price()
         self.filter_queryset()
         self.sort_queryset()
+        self.get_queryset_according_to_key_words()
         return self.queryset
