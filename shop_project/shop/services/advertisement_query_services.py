@@ -83,6 +83,10 @@ class AdvertisementQueryServices:
                     break
 
     def make_queryset(self):
+        self.get_sort_order()
+        self.get_filters()
+        self.get_price_bounds()
+        self.get_search_query()
         self.get_queryset_according_to_price()
         self.filter_queryset()
         self.sort_queryset()

@@ -17,16 +17,12 @@ class AllAdvertisementsView(APIView):
     def get(self, request, page_number):
         advertisement_query_services = AdvertisementQueryServices(request, SaleAdvertisement.objects.all())
         try:
-            advertisement_query_services.get_sort_order()
-            advertisement_query_services.get_filters()
-            advertisement_query_services.get_price_bounds()
-            advertisement_query_services.get_search_query()
+            advertisements = advertisement_query_services.make_queryset()[
+                             (page_number - 1) * self.MAX_ADVERTISEMENTS_ON_PAGE:
+                             page_number * self.MAX_ADVERTISEMENTS_ON_PAGE]
         except BadRequest:
             return Response({"errors": "Wrong query!"})
 
-        advertisements = advertisement_query_services.make_queryset()[
-                         (page_number - 1) * self.MAX_ADVERTISEMENTS_ON_PAGE:
-                         page_number * self.MAX_ADVERTISEMENTS_ON_PAGE]
         if len(advertisements) == 0:
             return Response({"information": "There is no data yet!"}, status=HTTP_204_NO_CONTENT)
 
