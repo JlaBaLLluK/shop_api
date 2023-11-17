@@ -40,11 +40,12 @@ class AddToFavouriteAdvertisementsView(APIView):
             return Response({"errors": "This advertisements doesn't exist!"}, status=HTTP_404_NOT_FOUND)
 
         try:
-            FavouriteAdvertisements.objects.get(advertisement=advertisement)
+            advertisement_in_favourite = FavouriteAdvertisements.objects.get(advertisement=advertisement, user=request.user)
         except ObjectDoesNotExist:
             favourite_advertisement = FavouriteAdvertisements(user=request.user, advertisement=advertisement)
             favourite_advertisement.save()
             return Response({"success": "Advertisement was added to favourite successfully!"}, status=HTTP_200_OK)
         else:
-            return Response({"success": "This advertisement already in favourite advertisements!"},
+            FavouriteAdvertisements.objects.get(pk=advertisement_in_favourite.pk).delete()
+            return Response({"success": "This advertisement was removed from favourite!"},
                             status=HTTP_204_NO_CONTENT)
