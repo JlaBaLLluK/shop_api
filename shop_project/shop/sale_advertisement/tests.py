@@ -5,7 +5,6 @@ from rest_framework.status import *
 from sale_advertisement.models import SaleAdvertisement
 from sale_advertisement.serializers import AllAdvertisementsSerializer, SingleAdvertisementSerializer
 from user.models import AuthUser
-from user.serializers import UserSerializer
 
 
 class GetAllAdvertisementsTests(APITestCase):
@@ -76,3 +75,13 @@ class GetSingleAdvertisementTests(APITestCase):
                                          advertisement_location="Minsk", publish_date=publish_date,
                                          advertisement_price="10.00", is_new=True, advertisement_author=author
                                          )
+
+    def test_if_get_single_advertisement_successful(self):
+        response = self.client.get(f"{self.url}{1}/")
+        self.assertEqual(SingleAdvertisementSerializer(SaleAdvertisement.objects.get(pk=1)).data, response.data)
+        self.assertEqual(response.status_code, HTTP_200_OK)
+
+    def test_if_get_single_advertisement_unsuccessful(self):
+        response = self.client.get(f"{self.url}{70}/")
+        self.assertEqual(response.data["errors"], "This advertisement doesn't exist!")
+        self.assertEqual(response.status_code, HTTP_404_NOT_FOUND)

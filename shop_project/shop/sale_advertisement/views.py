@@ -21,7 +21,7 @@ class AllAdvertisementsView(APIView):
                              (page_number - 1) * self.MAX_ADVERTISEMENTS_ON_PAGE:
                              page_number * self.MAX_ADVERTISEMENTS_ON_PAGE]
         except BadRequest:
-            return Response({"errors": "Wrong query!"})
+            return Response({"errors": "Wrong query!"}, status=HTTP_400_BAD_REQUEST)
 
         if len(advertisements) == 0:
             return Response({"information": "There is no data yet!"}, status=HTTP_204_NO_CONTENT)
