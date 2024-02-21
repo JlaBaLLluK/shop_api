@@ -75,6 +75,9 @@ class SingleAdvertisementView(APIView):
         if advertisement is None:
             return Response({"errors": "This advertisement doesn't exist!"}, status=HTTP_404_NOT_FOUND)
 
+        if request.user != advertisement.advertisement_author:
+            return Response({'error': "You can't change this advertisement!"}, status=HTTP_403_FORBIDDEN)
+
         serializer = SingleAdvertisementSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
