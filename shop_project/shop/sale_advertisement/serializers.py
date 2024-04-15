@@ -6,7 +6,7 @@ from sale_advertisement.models import SaleAdvertisement
 class AllAdvertisementsSerializer(ModelSerializer):
     class Meta:
         model = SaleAdvertisement
-        fields = ('advertisement_title', 'advertisement_price', 'publish_date',
+        fields = ('id', 'advertisement_title', 'advertisement_price', 'publish_date',
                   'advertisement_location', 'is_new', 'views_amount')
 
 
@@ -15,6 +15,7 @@ class SingleAdvertisementSerializer(ModelSerializer):
         model = SaleAdvertisement
         fields = '__all__'
 
-    def create(self, validated_data):
-        validated_data['advertisement_location'] = validated_data['advertisement_location'].capitalize()
-        super().create(validated_data)
+    def save(self, **kwargs):
+        self.validated_data['advertisement_location'] = (self.validated_data.get('advertisement_location')
+                                                         .lower().capitalize())
+        super().save()

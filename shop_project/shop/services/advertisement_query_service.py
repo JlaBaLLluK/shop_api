@@ -53,7 +53,6 @@ class AdvertisementQueryServices:
                 self.price_upper_bound = int(self.price_upper_bound)
             else:
                 self.price_upper_bound = 99_999_999
-
         except ValueError:
             raise BadRequest
 
@@ -78,7 +77,8 @@ class AdvertisementQueryServices:
     def get_queryset_according_to_key_words(self):
         for queryset_object in self.queryset:
             for key_word in self.key_words:
-                if key_word.lower() not in queryset_object.advertisement_description.lower():
+                if (key_word.lower() not in queryset_object.advertisement_description.lower() and
+                        key_word.lower() not in queryset_object.advertisement_title.lower()):
                     self.queryset = self.queryset.exclude(id=queryset_object.id)
                     break
 

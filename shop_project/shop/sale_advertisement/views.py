@@ -3,11 +3,13 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.status import *
+
+from sale_advertisement.permissions import IsAdvertisementOwner
 from sale_advertisement.serializers import *
 from rest_framework.views import APIView
 from sale_advertisement.models import *
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
-from services.advertisement_query_services import AdvertisementQueryServices
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from services.advertisement_query_service import AdvertisementQueryServices
 
 
 class AllAdvertisementsView(APIView):
@@ -27,7 +29,7 @@ class AllAdvertisementsView(APIView):
             return Response({"information": "There is no data yet!"}, status=HTTP_204_NO_CONTENT)
 
         serializer = AllAdvertisementsSerializer(advertisements, many=True)
-        return Response(serializer.data, status=HTTP_200_OK)
+        return Response(serializer.data)
 
 
 class CreateAdvertisementView(APIView):
@@ -40,13 +42,14 @@ class CreateAdvertisementView(APIView):
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
-        serializer.create(serializer.validated_data)
+        serializer.validated_data['advertisement_author'] = request.user
+        serializer.save()
         return Response(serializer.data, status=HTTP_201_CREATED)
 
 
 class SingleAdvertisementView(APIView):
     serializer_class = SingleAdvertisementSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsAdvertisementOwner]
 
     @staticmethod
     def get_advertisement(pk):
@@ -68,22 +71,19 @@ class SingleAdvertisementView(APIView):
             advertisement.save()
             advertisement.users_checked_advertisement.add(request.user)
 
-        return Response(SingleAdvertisementSerializer(advertisement).data, status=HTTP_200_OK)
+        return Response(SingleAdvertisementSerializer(advertisement).data)
 
     def put(self, request, page_number, pk):
         advertisement = self.get_advertisement(pk)
         if advertisement is None:
             return Response({"errors": "This advertisement doesn't exist!"}, status=HTTP_404_NOT_FOUND)
 
-        if request.user != advertisement.advertisement_author:
-            return Response({'error': "You can't change this advertisement!"}, status=HTTP_403_FORBIDDEN)
-
         serializer = SingleAdvertisementSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
         serializer.update(advertisement, serializer.validated_data)
-        return Response(serializer.data, status=HTTP_200_OK)
+        return Response(serializer.data)
 
     def delete(self, request, page_number, pk):
         advertisement = self.get_advertisement(pk)
@@ -91,4 +91,4 @@ class SingleAdvertisementView(APIView):
             return Response({"errors": "This advertisement doesn't exist!"}, status=HTTP_404_NOT_FOUND)
 
         advertisement.delete()
-        return Response({"success": "Advertisement was deleted successfully!"}, status=HTTP_200_OK)
+        return Response({"success": "Advertisement was deleted successfully!"})

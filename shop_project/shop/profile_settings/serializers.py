@@ -1,27 +1,29 @@
 from rest_framework.fields import CharField, EmailField
-from rest_framework.serializers import Serializer
+from rest_framework.serializers import Serializer, ModelSerializer
+
+from user.models import AuthUser
 
 
-class ChangePasswordSerializer(Serializer):
-    old_password = CharField(required=True)
+class ChangePasswordSerializer(ModelSerializer):
     new_password = CharField(required=True)
     new_password_confirm = CharField(required=True)
+
+    class Meta:
+        model = AuthUser
+        fields = ('password', 'new_password', 'new_password_confirm')
 
     def update(self, instance, validated_data):
         instance.set_password(validated_data.get('new_password'))
         instance.save()
 
 
-class ResetPasswordSerializer(Serializer):
-    pass
-
-
-class ChangeUsernameSerializer(Serializer):
-    new_username = CharField(required=True)
-    password = CharField(required=True)
+class ChangeUsernameSerializer(ModelSerializer):
+    class Meta:
+        fields = ('username', 'password')
+        model = AuthUser
 
     def update(self, instance, validated_data):
-        instance.username = validated_data.get('new_username')
+        instance.username = validated_data.get('username')
         instance.save()
 
 
@@ -30,14 +32,22 @@ class DeleteProfileSerializer(Serializer):
     password_confirm = CharField(required=True)
 
 
-class ChangeOtherInformationInformationSerializer(Serializer):
-    new_email = EmailField(required=False, default='')
-    new_first_name = CharField(required=False, default='')
-    new_last_name = CharField(required=False, default='')
-    password = CharField(required=True)
+class ChangeFirstLastNameSerializer(ModelSerializer):
+    class Meta:
+        model = AuthUser
+        fields = ('first_name', 'last_name', 'password')
 
     def update(self, instance, validated_data):
-        instance.first_name = validated_data.get('new_first_name')
-        instance.last_name = validated_data.get('new_last_name')
-        instance.email = validated_data.get('new_email')
+        instance.first_name = validated_data.get('first_name')
+        instance.last_name = validated_data.get('last_name')
+        instance.save()
+
+
+class ChangeEmailSerializer(ModelSerializer):
+    class Meta:
+        model = AuthUser
+        fields = ('email',)
+
+    def update(self, instance, validated_data):
+        instance.email = validated_data.get('email')
         instance.save()

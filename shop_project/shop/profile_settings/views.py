@@ -7,6 +7,8 @@ from rest_framework.views import APIView
 from profile_settings.serializers import *
 from rest_framework.status import *
 
+from user.serializers import UserSerializer
+
 
 class ChangePasswordView(APIView):
     serializer_class = ChangePasswordSerializer
@@ -19,7 +21,7 @@ class ChangePasswordView(APIView):
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
         user_object = request.user
-        if not check_password(serializer.data.get('old_password'), user_object.password):
+        if not check_password(serializer.data.get('password'), user_object.password):
             return Response({"errors": "Old password is wrong!"}, status=HTTP_400_BAD_REQUEST)
 
         if serializer.data.get('new_password') != serializer.data.get('new_password_confirm'):
@@ -31,16 +33,7 @@ class ChangePasswordView(APIView):
             return Response({'errors': error.messages}, status=HTTP_400_BAD_REQUEST)
 
         serializer.update(user_object, serializer.validated_data)
-        return Response({"success": "Password was changed successfully!"}, status=HTTP_200_OK)
-
-
-class ResetPasswordView(APIView):
-    serializer_class = ResetPasswordSerializer
-    permission_classes = [IsAuthenticated]
-
-    @staticmethod
-    def put(request):
-        pass
+        return Response({"success": "Password was changed successfully!"})
 
 
 class ChangeUsernameView(APIView):
@@ -59,14 +52,11 @@ class ChangeUsernameView(APIView):
             return Response({"errors": "New username can't be the same as the old username!"},
                             status=HTTP_400_BAD_REQUEST)
 
-        if new_username.count(' ') != 0:
-            return Response({"errors": "Username can't contain spaces!"}, status=HTTP_400_BAD_REQUEST)
-
         if not check_password(serializer.data.get('password'), user_object.password):
             return Response({"errors": "This password is wrong!"}, status=HTTP_400_BAD_REQUEST)
 
         serializer.update(user_object, serializer.validated_data)
-        return Response({"success": "Username was changed successfully!"}, status=HTTP_200_OK)
+        return Response({"success": "Username was changed successfully!"})
 
 
 class DeleteProfileView(APIView):
@@ -74,7 +64,7 @@ class DeleteProfileView(APIView):
     permission_classes = [IsAuthenticated]
 
     @staticmethod
-    def post(request):
+    def put(request):
         serializer = DeleteProfileSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
@@ -85,26 +75,18 @@ class DeleteProfileView(APIView):
             return Response({"errors": "Failed to confirm password!"}, status=HTTP_400_BAD_REQUEST)
 
         user_object.delete()
-        return Response({"success": "Account was deleted successfully!"}, status=HTTP_200_OK)
+        return Response({"success": "Account was deleted successfully!"})
 
 
-class ChangeOtherInformationView(APIView):
-    serializer_class = ChangeOtherInformationInformationSerializer
+class ChangeFirstLastNameView(APIView):
+    serializer_class = ChangeFirstLastNameSerializer
     permission_classes = [IsAuthenticated]
 
     @staticmethod
     def put(request):
-        serializer = ChangeOtherInformationInformationSerializer(data=request.data)
+        serializer = ChangeFirstLastNameSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
-
-        new_first_name = serializer.data.get('new_first_name')
-        if new_first_name.count(' ') != 0 or (new_first_name != '' and not new_first_name.isalpha()):
-            return Response({"errors": "New first name is invalid!"}, status=HTTP_400_BAD_REQUEST)
-
-        new_last_name = serializer.data.get('new_last_name')
-        if new_last_name.count(' ') != 0 or (new_last_name != '' and not new_last_name.isalpha()):
-            return Response({"errors": "New last name is invalid!"}, status=HTTP_400_BAD_REQUEST)
 
         password = serializer.data.get('password')
         user_object = request.user
@@ -112,4 +94,18 @@ class ChangeOtherInformationView(APIView):
             return Response({"errors": "This password is wrong!"}, status=HTTP_400_BAD_REQUEST)
 
         serializer.update(user_object, serializer.validated_data)
-        return Response({"success": "Data was changed successful!"}, status=HTTP_200_OK)
+        return Response({"success": "Data was changed successful!"})
+
+
+class ChangeEmailView(APIView):
+    serializer_class = ChangeEmailSerializer
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request):
+        serializer = ChangeEmailSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+        user_object = request.user
+        serializer.update(user_object, serializer.validated_data)
+        return Response(UserSerializer(request.user).data)

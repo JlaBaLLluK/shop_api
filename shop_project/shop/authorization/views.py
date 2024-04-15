@@ -20,7 +20,7 @@ class LoginView(APIView):
             return Response({"error": "Wrong credentials!"}, status=HTTP_401_UNAUTHORIZED)
 
         login(request, user_object)
-        return Response({"success": "Login successful!"}, status=HTTP_200_OK)
+        return Response({"success": "Login successful!"})
 
 
 class LogoutView(APIView):
@@ -29,4 +29,4 @@ class LogoutView(APIView):
     @staticmethod
     def post(request):
         logout(request)
-        return Response({"success": "Logout successful!"}, status=HTTP_200_OK)
+        return Response({"success": "Logout successful!"})

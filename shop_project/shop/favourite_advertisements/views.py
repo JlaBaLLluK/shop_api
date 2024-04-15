@@ -19,7 +19,7 @@ class AllFavouriteAdvertisementsView(APIView):
             return Response({"information": "There is no data yet!"}, status=HTTP_204_NO_CONTENT)
 
         serializer = AllFavouriteAdvertisementsSerializer(advertisements, many=True)
-        return Response(serializer.data, status=HTTP_200_OK)
+        return Response(serializer.data)
 
 
 class AddToFavouriteAdvertisementsView(APIView):

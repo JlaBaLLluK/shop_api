@@ -4,8 +4,8 @@ from profile_settings.views import *
 
 urlpatterns = [
     path('change-password/', ChangePasswordView.as_view()),
-    path('reset-password/', ResetPasswordView.as_view()),
     path('change-username/', ChangeUsernameView.as_view()),
     path('delete-account/', DeleteProfileView.as_view()),
-    path('change-other-information/', ChangeOtherInformationView.as_view()),
+    path('change-first-last-name/', ChangeFirstLastNameView.as_view()),
+    path('change-email/', ChangeEmailView.as_view())
 ]
